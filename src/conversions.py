@@ -1,4 +1,7 @@
 # Module with all the conversion functions used for registers
+#
+# All conversion functions follow an upper case convention to differentiate them
+# from other regular functions.
 
 def V(value, times):
     return "%s volts" % (value / float(times))
