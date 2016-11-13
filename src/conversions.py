@@ -200,13 +200,57 @@ def ChargingEquipmentStatus(value, times):
     D1: 0 Normal, 1 Fault.
     D0: 1 Running, 0 Standby.
     """
-    return "TODO: %s" % value
-    if value == 0x0:
-        return "Enabled"
-    elif value == 0x01:
-        return "Disabled"
+    stat = []
+    temp = (value & 0b1100000000000000) >> 14
+    if temp == 0x0:
+        stat.append("normal")
+    elif temp == 0x01:
+        stat.append("low")
+    elif temp == 0x02:
+        stat.append("high")
+    elif temp == 0x03:
+        stat.append("no access input volt error")
     else:
-        raise RuntimeError("No Such Test Mode: %s" % value)
+        raise RuntimeError("No such charging equipment status: %s" % value)
+
+    stat.append(", Output Power:")
+    temp = (value & 0b0011000000000000) >> 12
+    if temp == 0x0:
+        stat.append("light")
+    elif temp == 0x01:
+        stat.append("moderate")
+    elif temp == 0x02:
+        stat.append("rated")
+    elif temp == 0x03:
+        stat.append("overload")
+    else:
+        raise RuntimeError("No such output power: %s" % value)
+
+    tuples = [("ShortCircuit",            0b0000100000000000, 11),
+              ("UnableToDischarge",       0b0000010000000000, 10),
+              ("UnableToStopDischarging", 0b0000001000000000, 9),
+              ("OutputVoltageAbnormal",   0b0000000100000000, 8),
+              ("InputOverpressure",       0b0000000010000000, 7),
+              ("HighVoltageSideShort",    0b0000000001000000, 6),
+              ("BoostOverpressure",       0b0000000000100000, 5),
+              ("OutputOverpressure",      0b0000000000010000, 4),
+              ("Fault",                   0b0000000000000010, 1),
+              ("Running",                 0b0000000000000001, 0)]
+
+    # Iterate through the above tuples and generate output for each bitmasked
+    # and shifted value
+    for tup in tuples:
+        name = tup[0]
+        mask = tup[1]
+        shift = tup[2]
+        stat.append(", %s:" % name)
+        temp = (value & mask) >> shift
+        if temp == 0x1:
+            stat.append("True")
+        else:
+            stat.append("False")
+
+    return "".join(stat)
 
 
 def DischargingEquipmentStatus(value, times):
