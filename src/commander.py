@@ -85,6 +85,8 @@ def communicate(ser, deviceId, address, register, debug=False):
     Used to send and receive from the MPPT controller
 
     @param: ser The serial connection used to communicate
+    @param: deviceId The ID number of the device on the bus that we want to
+                     communicate with
     @param: address The address of the register that we will be querying
     @param: register The Register struct that we are passing
 
