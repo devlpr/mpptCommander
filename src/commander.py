@@ -139,7 +139,7 @@ def communicate(ser, deviceId, address, register, debug=False):
     else:
         raise RuntimeError("Inapropriate register address")
 
-    byteMessage = [deviceId, command, high, low, 0x0, v.numWords]
+    byteMessage = [deviceId, command, high, low, 0x0, register.numWords]
 
     addCRC(byteMessage)
 
