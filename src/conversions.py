@@ -244,7 +244,7 @@ def DischargingEquipmentStatus(value, times):
 def LENNIGHT(value, times):
     hour = (value & 0b1111111100000000) >> 8
     minute = value & 0b0000000011111111
-    return "hour:sec %s:%s" % (hour, minute)
+    return "hour:minute %s:%s" % (hour, minute)
 
 
 def RTCSECMIN(value, times):
