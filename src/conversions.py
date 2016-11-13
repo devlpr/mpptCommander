@@ -182,8 +182,8 @@ def ChargingEquipmentStatus(value, times):
     D15-D14:
         00H normal
         01H low
-        02H High
-        03H no access Input volt error
+        02H high
+        03H no access input volt error
     D13-D12: output power:
         00-light load,
         01-moderate,
