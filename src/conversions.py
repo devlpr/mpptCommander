@@ -279,13 +279,56 @@ def DISCHARGINGEQUIPMENTSTATUS(value, times):
     D1: 0 Normal, 1 Fault.
     D0: 1 Running, 0 Standby.
     """
-    return "TODO: %s" % value
-    if value == 0x0:
-        return "Enabled"
-    elif value == 0x01:
-        return "Disabled"
+    stat = ["InputVoltStatus", ]
+    temp = (value & 0b1100000000000000) >> 14
+    if temp == 0x0:
+        stat.append("normal")
+    elif temp == 0x01:
+        stat.append("no power connected")
+    elif temp == 0x02:
+        stat.append("higher volt input")
+    elif temp == 0x03:
+        stat.append("input voltage error")
     else:
-        raise RuntimeError("No Such Test Mode: %s" % value)
+        raise RuntimeError("No such input volt status: %s" % value)
+
+    stat.append(", ChargingStatus:")
+    temp = (value & 0b0000000000001100) >> 2
+    if temp == 0x0:
+        stat.append("no charging")
+    elif temp == 0x01:
+        stat.append("float")
+    elif temp == 0x02:
+        stat.append("boost")
+    elif temp == 0x03:
+        stat.append("equalization")
+    else:
+        raise RuntimeError("No such charging status: %s" % value)
+
+    tuples = [("ChargingMosfetShort",              0b0010000000000000, 13),
+              ("Charging/Anti-ReverseMosfetShort", 0b0001000000000000, 12),
+              ("Anti-reverseMosfetShort",          0b0000100000000000, 11),
+              ("InputOvercurrent",                 0b0000010000000000, 10),
+              ("LoadOvercurrent",                  0b0000001000000000, 9),
+              ("LoadShort",                        0b0000000100000000, 8),
+              ("LoadMosfetShort",                  0b0000000010000000, 7),
+              ("PVShort",                          0b0000000001000000, 4),
+              ("Status",                           0b0000000000000010, 1),
+              ("Running",                          0b0000000000000001, 0)]
+
+    # Iterate through the above tuples and generate output for each bitmasked
+    # and shifted value
+    for tup in tuples:
+        name = tup[0]
+        mask = tup[1]
+        shift = tup[2]
+        stat.append(", %s:" % name)
+        temp = (value & mask) >> shift
+        if temp == 0x1:
+            stat.append("True")
+        else:
+            stat.append("False")
+    return "".join(stat)
 
 
 def HOURMIN(value, times):
@@ -320,6 +363,11 @@ def DAYNIGHT(value, times):
     return "Night" if value == 1 else "Day"
 
 
-def FORCELOAD(value, times):
+def OFFON(value, times):
     return "On" if value == 1 else "Off"
+
+
+def MANAGEMENTMODES(value, times):
+    return "SOC" if value == 1 else "Voltage Compensation"
+
 
