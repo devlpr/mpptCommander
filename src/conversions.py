@@ -220,7 +220,7 @@ def DischargingEquipmentStatus(value, times):
     D12: Charging or Anti-reverse MOSFET is short.
     D11: Anti-reverse MOSFET is short.
     D10: Input is over current.
-    D9: The load is Over current.
+    D9: The load is over current.
     D8: The load is short.
     D7: Load MOSFET is short.
     D4: PV Input is short.
