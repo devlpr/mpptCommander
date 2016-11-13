@@ -132,45 +132,45 @@ def BatteryStatus(value, times):
         1-Wrong identification for rated voltage
     """
     stat = ["Battery Voltage:", ]
-    one = value & 0b0000000000001111
-    if one == 0x0:
+    temp = value & 0b0000000000001111
+    if temp == 0x0:
         stat.append("normal")
-    elif one == 0x01:
+    elif temp == 0x01:
         stat.append("over volt")
-    elif one == 0x02:
+    elif temp == 0x02:
         stat.append("under volt")
-    elif one == 0x03:
+    elif temp == 0x03:
         stat.append("low volt disconnect")
-    elif one == 0x04:
+    elif temp == 0x04:
         stat.append("fault")
     else:
         raise RuntimeError("No such battery voltage status: %s" % value)
 
     stat.append(", Battery Temperature:")
-    two = value & 0b0000000011110000
-    if two == 0x0:
+    temp = (value & 0b0000000011110000) >> 4
+    if temp == 0x0:
         stat.append("normal")
-    elif two == 0x01:
+    elif temp == 0x01:
         stat.append("higher than settings)")
-    elif two == 0x02:
+    elif temp == 0x02:
         stat.append("lower than settings")
     else:
         raise RuntimeError("No such battery temperature status: %s" % value)
 
     stat.append(", Battery internal resistance:") # D8
-    three = value & 0b0000000100000000
-    if three == 0x0:
+    temp = (value & 0b0000000100000000) >> 8
+    if temp == 0x0:
         stat.append("normal")
-    elif three == 0x01:
+    elif temp == 0x01:
         stat.append("abnormal")
     else:
         raise RuntimeError("No such battery resistance status: %s" % value)
 
     stat.append(", Rated voltage ID:") # D15
-    four = value & 0b1000000000000000
-    if four == 0x0:
+    temp = (value & 0b1000000000000000) >>  15
+    if temp == 0x0:
         stat.append("normal")
-    elif four == 0x01:
+    elif temp == 0x01:
         stat.append("wrong")
     else:
         raise RuntimeError("No such battery id value: %s" % value)
