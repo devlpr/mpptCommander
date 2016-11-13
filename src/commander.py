@@ -126,7 +126,7 @@ def communicate(ser, deviceId, address, register, debug=False):
     high = (0xFF00 & address) >> 8
 
     # Command changes based on register address.  This has to do with coils
-    # vs input registers vs realtime status
+    # vs input registers vs realtime status etc.
     command = None
     if address >= 0x1000 and address < 0x3000:
         command = 0x04
