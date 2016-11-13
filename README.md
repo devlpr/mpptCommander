@@ -17,8 +17,9 @@ mpptCommander.
 
 One important distinction is that this library does not use pymodbus. So there
 is one less dependency to deal with. This library is also about twice as fast 
-as tracer. Meaning that it gets the data about twice as fast. It takes quite a
-while to gather all the fields over modbus when running at 115200.
+as tracer (don't quote me on that, I didn't measure it, but it is faster).
+Meaning that it gets the data about twice as fast. It takes quite a while to
+gather all the fields over modbus when running at 115200.
 
 I started this project to help out a HAM radio friend of mine.  He has been using
 the Renogy controllers for some time now and he's a Linux user.  He wanted a way 
