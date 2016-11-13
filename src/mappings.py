@@ -1,13 +1,38 @@
+# Module to describe all the potential commands that the Renogy Commander
+# supports.
+#
+# Author: Darin Velarde
+#
+# 
 from collections import namedtuple
 
+# I typically don't like import * but I actually need every symbol from
+# conversions.
+from conversions import *
 
+
+# Register
+# ** immutable data type **
+# Represents a queryable register/coil/statistical parameter/etc.
 class Register(namedtuple("Register", ["name",
                                        "desc",
                                        "unit",
                                        "times",
                                        "numWords"])):
     """
+    @type name: string
+    @param name: The display text of the register.
+    @type desc: string
+    @param desc: A longer description for use in a GUI or similar use-case.
+    @type unit: function pointer
+    @param unit: A function pointer that will do the conversion from bytes to
+                     the readable value.
+    @type times: int
+    @param times: The multiplier that was used when setting this value.
+    @type numWords: int
+    @param numWords: The number of 16 bit words (registers) to read.
     """
+    __slots__ = ()
 
 
 

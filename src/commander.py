@@ -1,5 +1,24 @@
 #!/usr/bin/env python
-
+#
+# Author: Darin Velarde
+#
+# Commander interface for Renogy 20A charge controller.
+# 
+# The first question you might ask is why I wrote this.  The answer is that I
+# hadn't found the one here https://github.com/kasbert/epsolar-tracer yet. The
+# other half of the answer is that I probably would have anyway since I had
+# never used modbus before. There are some interesting similarities between this
+# library and the epsolar-tracer, namely the Register data type and it's data
+# fields. They are not 100% compatible but whoever wrote tracer and I obviously
+# thought similarly about the problem space.
+#
+# One important distinction is that this library does not use pymodbus. So there
+# is one less dependency to deal with.
+#
+# This library is also about twice as fast as tracer. Meaning that it gets the
+# data about twice as fast. It takes quite a while to gather all the fields.
+#
+# This file is the entry point in order to use the controller over RS 485
 import crc
 import os
 import platform
@@ -36,7 +55,9 @@ def getRs485(port=None):
                             xonxoff=0, # enable software flow control
                             rtscts=0) # enable RTS/CTS flow control
         # On linux the rs485 settings are not used.  The driver has the port
-        # hard coded to rs485
+        # hard coded to rs485. That driver can be found here along with another
+        # python implementation that does something similar to this one.
+        # https://github.com/kasbert/epsolar-tracer
     else:
         if not port:
             port = "COM4"
@@ -55,6 +76,11 @@ def getRs485(port=None):
 def addCRC(messageBytes):
     """
     Adds CRC to the byte buffer as the last two indices
+
+    Given an array of bytes, return the same array with two more bytes appended
+    to the end.  These two new bytes are the CRC.
+
+    Notice that there is no return value.  The bytes are added in situ.
     """
     crcv = crc.INITIAL_MODBUS
     for ch in messageBytes:
@@ -67,7 +93,11 @@ def addCRC(messageBytes):
 
 def combineBytes(data):
     """
-    Combine multiple bytes into a final value
+    Combine multiple bytes into a final value.  The data argument is expected to
+    be an iterable container that contains 'len % 2 == 0' elements.  It will
+    iterate over each set of two elements and combine the low and high bytes
+    shifting each time it encounters a new byte pair.  The resulting value is
+    the integer value of the combined bytes.
     """
     combined = 0
     bits = 8
