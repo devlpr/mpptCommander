@@ -141,7 +141,7 @@ def communicate(ser, deviceId, address, register, debug=False):
 
     byteMessage = [deviceId, command, high, low, 0x0, register.numWords]
 
-    addCRC(byteMessage)
+    addCRC(byteMessage) # This puts the CRC on the message in situ
 
     # If we have debug on, print out what we send and receive
     if debug:
