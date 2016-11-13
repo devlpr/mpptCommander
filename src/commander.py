@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import crc
+import os
 import platform
 import rrdtool
-import os
 import serial
 import serial.rs485
 import sys
@@ -127,7 +127,7 @@ def communicate(ser, deviceId, address, register, debug=False):
         if r:
             rec.append(r)
         else:
-            # Received Empty, call it done
+            # Received empty, call it done
             break
 
     # If we have debug on, print out what we send and receive
