@@ -8,7 +8,6 @@ import serial
 import serial.rs485
 import sys
 import time
-from rrdtool import update as rrd_update
 
 import mappings
 
@@ -147,36 +146,18 @@ if __name__ == "__main__":
     """
     Test getting data from the Commander and print it to the screen
     """
-    rrdfile = os.path.expanduser("~/solarDb.rrd")
-    print rrdfile
-    if not os.path.exists(rrdfile):
-        ret = rrdtool.create(rrdfile, "--step", "1", "--start", '0',
-                             "DS:0x3000:GAUGE:2000:U:U",
-                             "DS:0x3001:GAUGE:2000:U:U",
-                             "DS:0x331A:GAUGE:2000:U:U",
-                             "RRA:AVERAGE:0.5:1s:10d",
-                             "RRA:AVERAGE:0.5:1m:90d",
-                             "RRA:AVERAGE:0.5:1h:18M",
-                             "RRA:AVERAGE:0.5:1d:10y",
-                             "RRA:MAX:0.5:1s:10d",
-                             "RRA:MAX:0.5:1m:90d",
-                             "RRA:MAX:0.5:1h:18M",
-                             "RRA:MAX:0.5:1d:10y")
-        print "Created", os.path.exists(rrdfile)
-
     ser = getRs485()
 
     try:
         # The ID of the device we are going to communicate with.
         deviceId = 0x01
-        for _ in xrange(1):
-            toLog = {}
+
+        # Query the device 10 times and exit
+        for _ in xrange(10):
             for addr, v in sorted(mappings.RegistersA.iteritems()):
                 value = communicate(ser, deviceId, addr, v, debug=False)
                 print "%s \"%s\": %s" % (hex(addr), v.name, value)
-
-            #ret = rrd_update(rrdfile, 'N:%s:%s:%s' %(items[0], items[1], items[2]))
-            time.sleep(1)
+            time.sleep(10)
     except:
         raise
     finally:
