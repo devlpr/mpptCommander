@@ -52,7 +52,7 @@ def MONTH(value, times):
     return "%s month" % (value / float(times))
 
 
-def ChargingMode(value, times):
+def CHARGINGMODE(value, times):
     if value == 0x00:
         return "Connect/Disconnect"
     elif value == 0x01:
@@ -63,7 +63,7 @@ def ChargingMode(value, times):
         raise RuntimeError("No Such Charging Mode: %s" % value)
 
 
-def BatteryType(value, times):
+def BATTERYTYPE(value, times):
     if value == 0x01:
         return "Sealed"
     elif value == 0x02:
@@ -76,7 +76,7 @@ def BatteryType(value, times):
         raise RuntimeError("No Such Battery Type: %s" % value)
 
 
-def LoadControlModes(value, times):
+def LOADCONTROLMODES(value, times):
     if value == 0x0:
         return "User defined"
     elif value == 0x01:
@@ -111,7 +111,7 @@ def ENABLETEST(value, times):
         raise RuntimeError("No Such Test Mode: %s" % value)
 
 
-def BatteryStatus(value, times):
+def BATTERYSTATUS(value, times):
     """
     D3-D0:
         00H Normal,
@@ -177,7 +177,7 @@ def BatteryStatus(value, times):
     return " ".join(stat)
 
 
-def ChargingEquipmentStatus(value, times):
+def CHARGINGEQUIPMENTSTATUS(value, times):
     """
     D15-D14:
         00H normal
@@ -253,7 +253,7 @@ def ChargingEquipmentStatus(value, times):
     return "".join(stat)
 
 
-def DischargingEquipmentStatus(value, times):
+def DISCHARGINGEQUIPMENTSTATUS(value, times):
     """
     D15-D14: Input volt status.
         00 normal
@@ -285,7 +285,7 @@ def DischargingEquipmentStatus(value, times):
         raise RuntimeError("No Such Test Mode: %s" % value)
 
 
-def LENNIGHT(value, times):
+def HOURMIN(value, times):
     hour = (value & 0b1111111100000000) >> 8
     minute = value & 0b0000000011111111
     return "hour:minute %s:%s" % (hour, minute)
