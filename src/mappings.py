@@ -11,11 +11,16 @@ class Register(namedtuple("Register", ["name",
 
 
 
-
-
-# The last argument to Register is the number of 16 bit words in the data
-# returned for that item
-RegistersA = {
+# For clarity I am letting these lines be long. I am less concerned with brevity
+# here.  Right or wrong, that's the choice I made.
+REGISTERS = {
+    # Coils
+    2: Register("Manual control the load", "When the load is manual mode, 1-manual on, 0 -manual off", MANUALMODE, 1, 1),
+    5: Register("Enable load test mode", "1 Enable, 0 Disable(normal)", ENABLETEST, 1, 1),
+    6: Register("Force the load on/off", "1 Turn on, 0 Turn off (used for temporary test of the load)", FORCELOAD, 1, 1),
+    0x2000: Register("Over temperature inside the device", "Over temperature inside device", OVERTEMP, 1, 1),
+    0x200C: Register("Day/Night", "1-Night, 0-Day", DAYNIGHT, 1, 1),
+    # Input registers
     0x3000: Register("Charging equipment rated input voltage", "PV array rated voltage", V, 100, 1),
     0x3001: Register("Charging equipment rated input current", "PV array rated current", A, 100, 1),
     0x3002: Register("Charging equipment rated input power", "PV array rated power (low 16 bits)", W, 100, 2),
@@ -39,6 +44,9 @@ RegistersA = {
     0x311A: Register("Battery SOC", "Percentage of battery's remaining capacity", P, 100, 1),
     0x311B: Register("Remote battery temperature", "Battery temperature measured by remote sensor", D, 100, 1),
     0x311D: Register("Battery real rated power", "Current system rated voltage (1200, 2400 represents 12v, 24v", V, 100, 1),
+    0x3200: Register("Battery status", "Battery real time state", BatteryStatus, None, 1),
+    0x3201: Register("Charging equipement status", "Charging equipment status", ChargingEquipmentStatus, None, 1),
+    0x3202: Register("Discharging equipement status", "Discharging equipment status", DischargingEquipmentStatus, None, 1),
     0x3300: Register("Maximum input (PV) today", "00: 00 Refresh every day", V, 100, 1),
     0x3301: Register("Minimum input (PV) today", "00: 00 Refresh every day", V, 100, 1),
     0x3302: Register("Maximum battery volt today", "00: 00 Refresh every day", V, 100, 1),
@@ -46,17 +54,16 @@ RegistersA = {
     0x3304: Register("Consumed energy today", "00: 00 Clear every day", KWH, 100, 2),
     0x3306: Register("Consumed energy this month", "00: 00 Clear on the first day of the month", KWH, 100, 2),
     0x3308: Register("Consumed energy this year", "00: 00 Clear on 1, Jan.", KWH, 100, 2),
-    #0x3309: Register("Consumed energy this year H", "00: 00 Clear on 1, Jan.", KWH, 100, 1),
     0x330A: Register("Total consumed energy", "Total consumed energy", KWH, 100, 2),
     0x330C: Register("Generated energy today", "00: 00 Clear every day", KWH, 100, 2),
     0x330E: Register("Generated energy this month", "00: 00 Clear on the first day of the month", KWH, 100, 2),
     0x3310: Register("Generated energy this year", "00: 00 Clear on Jan 1", KWH, 100, 2),
     0x3312: Register("Total generated energy", "Total generated energy", KWH, 100, 2),
     0x331A: Register("Battery voltage", "Battery voltage", V, 100, 1),
-    0x331B: Register("Battery current", "Battery current", AH, 100, 2),
-
+    0x331B: Register("Battery current", "Battery current", A, 1, 2),
+    # Holding registers
     0x9000: Register("Battery type", "Battery make-up (Sealed, Gel, Flooded, User)", BatteryType, None, 1),
-    0x9001: Register("Battery capacity", "Rated capacity of battery", AH, None, 1),
+    0x9001: Register("Battery capacity", "Rated capacity of battery", AH, 100, 1),
     0x9002: Register("Temperature compensation coefficient", "Range 0-9", COEF, 1, 1),
     0x9003: Register("High volt disconnect", "High volt disconnect", V, 100, 1),
     0x9004: Register("Charging limit voltage", "Charging limit voltage", V, 100, 1),
@@ -76,10 +83,7 @@ RegistersA = {
     0x9017: Register("Battery temperature warning upper limit", "Battery temp warning upper limit", D, 100, 1),
     0x9018: Register("Battery temperature warning lower limit", "Battery temp warning lower limit", D, 100, 1),
     0x9019: Register("Controller inner temperature upper limit", "Controller inner temperature upper limit", D, 100, 1),
-    0x901a: Register("Controller inner temperature upper limit recover", "Controller inner temperature upper limit recover", D, 100, 1),
-    0x901e: Register("Day time threshold volt", "Day time threshold volt", V, 100, 1),
-
-    # New ones
+    0x901A: Register("Controller inner temperature upper limit recover", "Controller inner temperature upper limit recover", D, 100, 1),
     0x901E: Register("Night TimeThreshold Volt.(NTTV)", " PV lower lower than this value, controller would detect it as sundown", V, 100, 1),
     0x901F: Register("Light signal startup (night) delay time", "PV voltage lower than NTTV, and duration exceeds the Light signal startup (night) delay time, controller would detect it as night time.", MIN, 1, 1),
     0x9020: Register("Day Time Threshold Volt.(DTTV)", "PV voltage higher than this value, controller would detect it as sunrise", V, 100, 1),
@@ -107,18 +111,5 @@ RegistersA = {
     0x906C: Register("Boost duration", "Usually 60-120 minutes.", MIN, 1, 1),
     0x906D: Register("Discharging percentage", "Usually 20%-80%. The percentage of battery's remaining capacity when stop charging", P, 1, 1),
     0x906E: Register("Charging percentage", "Depth of charge, 20%-100%.", P, 1, 1),
-    0x9070: Register("Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.", STR, 1, 1),
-    0x3200: Register("Battery status", "Battery real time state", BatteryStatus, None, 1),
-    0x3201: Register("Charging equipement status", "Charging equipment status", ChargingEquipmentStatus, None, 1),
-    0x3202: Register("Discharging equipement status", "Discharging equipment status", DischargingEquipmentStatus, None, 1),
-    # Coils
-    2: Register("Manual control the load", "When the load is manual mode, 1-manual on, 0 -manual off", MANUALMODE, 1, 1),
-    5: Register("Enable load test mode", "1 Enable, 0 Disable(normal)", ENABLETEST, 1, 1)}
+    0x9070: Register("Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.", STR, 1, 1)}
 
-# Coils(read-write)
-coils = {
-    6: Register("Force the load on/off", "1 Turn on, 0 Turn off (used for temporary test of the load)", STR, 1, 1),
-    # Discrete input (read-only)
-    0x2000: Register("Over temperature inside the device", "1 The temperature inside the controller is higher than the over-temperature protection point. 0 Normal", STR, 1, 1),
-    0x200C: Register("Day/Night", "1-Night, 0-Day", STR, 1, 1)
-    }
