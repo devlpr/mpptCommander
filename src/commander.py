@@ -193,10 +193,7 @@ if __name__ == "__main__":
                 # Convert to readable text
                 readable = reg.unit(value, reg.times)
 
-                print "%s \"%s\": %s, Actual: %s" % (hex(addr),
-                                                     reg.name,
-                                                     readable,
-                                                     value)
+                print "%s \"%s\": %s" % (hex(addr), reg.name, readable)
             time.sleep(1)
     except:
         raise
