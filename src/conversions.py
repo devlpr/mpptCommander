@@ -79,6 +79,20 @@ def BATTERYTYPE(value, times):
         raise RuntimeError("No Such Battery Type: %s" % value)
 
 
+def BATTERYRATEDVOLTAGE(value, times):
+    """
+    0, auto recognize. 1-12V, 2-24V
+    """
+    if value == 0:
+        return "auto recognize"
+    elif value == 1:
+        return "12v"
+    elif value == 2:
+        return "24v"
+    else:
+        raise RuntimeError("No Such Battery Rated Voltage: %s" % value)
+
+
 def LOADCONTROLMODES(value, times):
     if value == 0x0:
         return "User defined"
@@ -90,6 +104,14 @@ def LOADCONTROLMODES(value, times):
         return "Time Control"
     else:
         raise RuntimeError("No Such Battery Type: %s" % value)
+
+
+def LOADTIMINGCONTROLSELECTION(value, times):
+    """
+    Selected timing period of the load
+    0, using one timer, 1-using two timer, etc...
+    """
+    return "%s timer(s)" % (value + 1)
 
 
 def COEF(value, times):

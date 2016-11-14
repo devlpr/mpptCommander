@@ -129,12 +129,12 @@ REGISTERS = {
     0x904C: Register("Turn off timing 2 min", "Turn off timing 2 min", MIN, 1, 1),
     0x904D: Register("Turn off timing 2 hour", "Turn off timing 2 hour", HOUR, 1, 1),
     0x9065: Register("Length of night", "Set default values of the whole night length of time. D15-D8,hour, D7-D0, minute", HOURMIN, 1, 1),
-    0x9067: Register("Battery rated voltage code", "0, auto recognize. 1-12V, 2-24V", STR, 1, 1),
-    0x9069: Register("Load timing control selection", "Selected timeing period of the load.0, using one timer, 1-using two timer, likewise.", STR, 1, 1),
+    0x9067: Register("Battery rated voltage code", "0, auto recognize. 1-12V, 2-24V", BATTERYRATEDVOLTAGE, 1, 1),
+    0x9069: Register("Load timing control selection", "Selected timing period of the load.0, using one timer, 1-using two timer, etc", LOADTIMINGCONTROLSELECTION, 1, 1),
     0x906A: Register("Default Load On/Off in manual mode", "0-off, 1-on", OFFON, 1, 1),
     0x906B: Register("Equalize duration", "Usually 60-120 minutes.", MIN, 1, 1),
     0x906C: Register("Boost duration", "Usually 60-120 minutes.", MIN, 1, 1),
     0x906D: Register("Discharging percentage", "Usually 20%-80%. The percentage of battery's remaining capacity when stop charging", P, 1, 1),
     0x906E: Register("Charging percentage", "Depth of charge, 20%-100%.", P, 1, 1),
-    0x9070: Register("Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.", STR, 1, 1)}
+    0x9070: Register("Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.", MANAGEMENTMODES, 1, 1)}
 
