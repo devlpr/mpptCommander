@@ -15,9 +15,6 @@
 # One important distinction is that this library does not use pymodbus. So there
 # is one less dependency to deal with.
 #
-# This library is also about twice as fast as tracer. Meaning that it gets the
-# data about twice as fast. It takes quite a while to gather all the fields.
-#
 # This file is the entry point in order to use the controller over RS 485
 import crc
 import os
