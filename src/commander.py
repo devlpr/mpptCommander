@@ -186,7 +186,7 @@ if __name__ == "__main__":
         deviceId = 0x01
 
         # Query the device 10 times and exit
-        for _ in xrange(1):
+        for _ in xrange(10):
             for addr, reg in sorted(mappings.REGISTERS.iteritems()):
                 value = communicate(ser, deviceId, addr, reg, debug=False)
 
