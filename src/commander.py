@@ -197,7 +197,7 @@ if __name__ == "__main__":
                                                      reg.name,
                                                      readable,
                                                      value)
-            time.sleep(10)
+            time.sleep(1)
     except:
         raise
     finally:
