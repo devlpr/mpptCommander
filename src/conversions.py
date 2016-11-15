@@ -120,7 +120,7 @@ def COEF(value, times):
 
 def MANUALMODE(value, times):
     if value == 0x0:
-        return "AUTO"
+        return "Auto"
     elif value == 0x01:
         return "Manual"
     else:
