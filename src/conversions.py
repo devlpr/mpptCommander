@@ -353,28 +353,25 @@ def DISCHARGINGEQUIPMENTSTATUS(value, times):
     return "".join(stat)
 
 
+def __getLowAndHighBytes(value):
+    high = (value & 0b1111111100000000) >> 8
+    low = value & 0b0000000011111111
+    return (high, low)
+
 def HOURMIN(value, times):
-    hour = (value & 0b1111111100000000) >> 8
-    minute = value & 0b0000000011111111
-    return "hour:minute %s:%s" % (hour, minute)
+    return "hour:minute %s:%s" % __getLowAndHighBytes(value)
 
 
 def RTCSECMIN(value, times):
-    minute = (value & 0b1111111100000000) >> 8
-    sec = value & 0b0000000011111111
-    return "%s:%s" % (minute, sec)
+    return "%s:%s" % __getLowAndHighBytes(value)
 
 
 def RTCHOURDAY(value, times):
-    day = (value & 0b1111111100000000) >> 8
-    hour = value & 0b0000000011111111
-    return "%s:%s" % (day, hour)
+    return "%s:%s" % __getLowAndHighBytes(value)
 
 
 def RTCYEARMONTH(value, times):
-    year = (value & 0b1111111100000000) >> 8
-    month = value & 0b0000000011111111
-    return "%s:%s" % (year, month)
+    return "%s:%s" % __getLowAndHighBytes(value)
 
 
 def OVERTEMP(value, times):
