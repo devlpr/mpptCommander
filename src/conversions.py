@@ -1,142 +1,217 @@
+from collections import namedtuple
 # Module with all the conversion functions used for registers
 #
 # All conversion functions follow an upper case convention to differentiate them
 # from other regular functions.
 
-def V(value, times):
-    return "%s volts" % (value / float(times))
+class Result(namedtuple("Result", ["register", "unit", "value"])):
+    """
+    @type register: integer
+    @param register: The integer used to describe a register (e.g. 0x3000)
+    @type unit: string
+    @param unit: The units that the value is in
+    @type value: number or string
+    @param value: The result in the units mentioned above
+    """
+    __slots__ = ()
+
+def __getLowAndHighBytes(value):
+    high = (value & 0b1111111100000000) >> 8
+    low = value & 0b0000000011111111
+    return (high, low)
 
 
-def A(value, times):
-    return "%s amps" % (value / float(times))
+def V(address, value, times):
+    return Result(address, "Volts", value / float(times))
 
 
-def W(value, times):
-    return "%s watts" % (value / float(times))
+def A(address, value, times):
+    return Result(address, "Amps", value / float(times))
 
 
-def D(value, times):
-    return "%s degrees C" % (value / float(times))
+def W(address, value, times):
+    return Result(address, "Watts", value / float(times))
 
 
-def P(value, times):
-    return "%s percent" % value
+def D(address, value, times):
+    return Result(address, "Degrees C", value / float(times))
 
 
-def KWH(value, times):
-    return "%s kwh" % (value / float(100))
+def P(address, value, times):
+    return Result(address, "Percent", value)
 
 
-def KWH(value, times):
-    return "%s kwh" % (value / float(100))
+def KWH(address, value, times):
+    return Result(address, "KWH", value / float(times))
 
 
-def AH(value, times):
-    return "%s ah" % value
+def AH(address, value, times):
+    return Result(address, "AH", value)
 
 
-def STR(value, times):
-    return " :: %s" % value
+def SEC(address, value, times):
+    return Result(address, "Seconds", (value / float(times)))
 
 
-def SEC(value, times):
-    return "%s seconds" % (value / float(times))
+def MIN(address, value, times):
+    return Result(address, "Minute", (value / float(times)))
 
 
-def MIN(value, times):
-    return "%s minute" % (value / float(times))
+def HOUR(address, value, times):
+    return Result(address, "Hour", (value / float(times)))
 
 
-def HOUR(value, times):
-    return "%s hour" % (value / float(times))
+def MONTH(address, value, times):
+    return Result(address, "Month", (value / float(times)))
 
 
-def MONTH(value, times):
-    return "%s month" % (value / float(times))
+def HOURMIN(address, value, times):
+    hour, minute = __getLowAndHighBytes(value)
+    results = []
+    results.append(Result(address, "Hour", hour))
+    results.append(Result(address, "Minute", minute))
+    return results
 
 
-def CHARGINGMODE(value, times):
+def RTCSECMIN(address, value, times):
+    minute, second = __getLowAndHighBytes(value)
+    results = []
+    results.append(Result(address, "Minute", minute))
+    results.append(Result(address, "Seconds", second))
+    return results
+
+
+def RTCHOURDAY(address, value, times):
+    day, hour = __getLowAndHighBytes(value)
+    results = []
+    results.append(Result(address, "Day", day))
+    results.append(Result(address, "Hour", hour))
+    return results
+
+
+def RTCYEARMONTH(address, value, times):
+    year, month = __getLowAndHighBytes(value)
+    results = []
+    results.append(Result(address, "Year", year))
+    results.append(Result(address, "Month", month))
+    return results
+
+
+def OVERTEMP(address, value, times):
+    return Result(address, "Over Temp", "Yes" if value == 1 else "No")
+
+
+def DAYNIGHT(address, value, times):
+    return Result(address, "Night", True if value == 1 else False)
+
+
+def OFFON(address, value, times):
+    return Result(address, "On", True if value == 1 else False)
+
+
+def COEF(address, value, times):
+    return Result(address, "mV/C/2", value / times)
+
+
+def MANAGEMENTMODES(address, value, times):
+    return Result(address,
+                  "Management Mode",
+                  "SOC" if value == 1 else "voltage compensation")
+
+
+def CHARGINGMODE(address, value, times):
+    ret = None
     if value == 0x00:
-        return "Connect/Disconnect"
+        ret = "Connect/Disconnect"
     elif value == 0x01:
-        return "PWM"
+        ret = "PWM"
     elif value == 0x02:
-        return "MPPT"
+        ret = "MPPT"
     else:
         raise RuntimeError("No Such Charging Mode: %s" % value)
+    return Result(address, "Charging Mode", ret)
 
 
-def BATTERYTYPE(value, times):
+def BATTERYTYPE(address, value, times):
+    ret = None
     if value == 0x01:
-        return "Sealed"
+        ret = "Sealed"
     elif value == 0x02:
-        return "Gel"
+        ret = "Gel"
     elif value == 0x03:
-        return "Flooded"
+        ret = "Flooded"
     elif value == 0x0:
-        return "User defined"
+        ret = "User defined"
     else:
         raise RuntimeError("No Such Battery Type: %s" % value)
+    return Result(address, "Battery Type", ret)
 
 
-def BATTERYRATEDVOLTAGE(value, times):
+def BATTERYRATEDVOLTAGE(address, value, times):
     """
     0, auto recognize. 1-12V, 2-24V
     """
+    ret = None
     if value == 0:
-        return "auto recognize"
+        ret = "auto recognize"
     elif value == 1:
-        return "12v"
+        ret = "12v"
     elif value == 2:
-        return "24v"
+        ret = "24v"
     else:
         raise RuntimeError("No Such Battery Rated Voltage: %s" % value)
+    return Result(address, "Battery Rated Voltage", ret)
 
 
-def LOADCONTROLMODES(value, times):
+def LOADCONTROLMODES(address, value, times):
+    ret = None
     if value == 0x0:
-        return "User defined"
+        ret = "User defined"
     elif value == 0x01:
-        return "Light ON/OFF"
+        ret = "Light ON/OFF"
     elif value == 0x02:
-        return "Light ON+ Timer"
+        ret = "Light ON+ Timer"
     elif value == 0x03:
-        return "Time Control"
+        ret = "Time Control"
     else:
         raise RuntimeError("No Such Battery Type: %s" % value)
+    return Result(address, "Load Control Modes", ret)
 
 
-def LOADTIMINGCONTROLSELECTION(value, times):
+def LOADTIMINGCONTROLSELECTION(address, value, times):
     """
     Selected timing period of the load
     0, using one timer, 1-using two timer, etc...
     """
-    return "%s timer(s)" % (value + 1)
+    return Result(address,
+                  "Load Timing Control Selection (Number of timers)",
+                  value + 1)
 
 
-def COEF(value, times):
-    return "%s mV/C/2" % (value / times)
-
-
-def MANUALMODE(value, times):
+def MANUALMODE(address, value, times):
+    ret = None
     if value == 0x0:
-        return "Auto"
+        ret = "Auto"
     elif value == 0x01:
-        return "Manual"
+        ret = "Manual"
     else:
         raise RuntimeError("No Such Mode: %s" % value)
+    return Result(address, "Manual Mode", ret)
 
 
-def ENABLETEST(value, times):
+
+def ENABLETEST(address, value, times):
+    ret = None
     if value == 0x0:
-        return "Enabled"
+        ret = "Enabled"
     elif value == 0x01:
-        return "Disabled"
+        ret = "Disabled"
     else:
         raise RuntimeError("No Such Test Mode: %s" % value)
+    return Result(address, "Enable Test", ret)
 
 
-def BATTERYSTATUS(value, times):
+def BATTERYSTATUS(address, value, times):
     """
     D3-D0:
         00H Normal,
@@ -156,53 +231,58 @@ def BATTERYSTATUS(value, times):
     D15:
         1-Wrong identification for rated voltage
     """
-    stat = ["Battery Voltage:", ]
+    results = []
+    res = None
     temp = value & 0b0000000000001111
     if temp == 0x0:
-        stat.append("normal")
+        res = "normal"
     elif temp == 0x01:
-        stat.append("over volt")
+        res = "over volt"
     elif temp == 0x02:
-        stat.append("under volt")
+        res = "under volt"
     elif temp == 0x03:
-        stat.append("low volt disconnect")
+        res = "low volt disconnect"
     elif temp == 0x04:
-        stat.append("fault")
+        res = "fault"
     else:
         raise RuntimeError("No such battery voltage status: %s" % value)
+    results.append(Result(address, "Battery Voltage", res))
 
-    stat.append(", Battery Temperature:")
+    res = None
     temp = (value & 0b0000000011110000) >> 4
     if temp == 0x0:
-        stat.append("normal")
+        res = "normal"
     elif temp == 0x01:
-        stat.append("higher than settings)")
+        res = "higher than settings)"
     elif temp == 0x02:
-        stat.append("lower than settings")
+        res = "lower than settings"
     else:
         raise RuntimeError("No such battery temperature status: %s" % value)
+    results.append(Result(address, "Battery Temperature", res))
 
-    stat.append(", Battery internal resistance:") # D8
+    res = None
     temp = (value & 0b0000000100000000) >> 8
     if temp == 0x0:
-        stat.append("normal")
+        res = "normal"
     elif temp == 0x01:
-        stat.append("abnormal")
+        res = "abnormal"
     else:
         raise RuntimeError("No such battery resistance status: %s" % value)
+    results.append(Result(address, "Battery Internal Resistance", res))
 
-    stat.append(", Rated voltage ID:") # D15
+    res = 0
     temp = (value & 0b1000000000000000) >>  15
     if temp == 0x0:
-        stat.append("normal")
+        res = "normal"
     elif temp == 0x01:
-        stat.append("wrong")
+        res = "wrong"
     else:
         raise RuntimeError("No such battery id value: %s" % value)
-    return " ".join(stat)
+    results.append(Result(address, "Rated Voltage ID", res))
+    return results
 
 
-def CHARGINGEQUIPMENTSTATUS(value, times):
+def CHARGINGEQUIPMENTSTATUS(address, value, times):
     """
     D15-D14:
         00H normal
@@ -225,42 +305,45 @@ def CHARGINGEQUIPMENTSTATUS(value, times):
     D1: 0 Normal, 1 Fault.
     D0: 1 Running, 0 Standby.
     """
-    stat = []
+    results = []
+    res = None
     temp = (value & 0b1100000000000000) >> 14
     if temp == 0x0:
-        stat.append("normal")
+        res = "normal"
     elif temp == 0x01:
-        stat.append("low")
+        res = "low"
     elif temp == 0x02:
-        stat.append("high")
+        res = "high"
     elif temp == 0x03:
-        stat.append("no access input volt error")
+        res = "no access input volt error"
     else:
         raise RuntimeError("No such charging equipment status: %s" % value)
+    results.append(Result(address, "Charging Equipment Status", res))
 
-    stat.append(", Output Power:")
+    res = None
     temp = (value & 0b0011000000000000) >> 12
     if temp == 0x0:
-        stat.append("light")
+        res = "light"
     elif temp == 0x01:
-        stat.append("moderate")
+        res = "moderate"
     elif temp == 0x02:
-        stat.append("rated")
+        res = "rated"
     elif temp == 0x03:
-        stat.append("overload")
+        res = "overload"
     else:
         raise RuntimeError("No such output power: %s" % value)
+    results.append(Result(address, "Output Power", res))
 
-    tuples = [("ShortCircuit",            0b0000100000000000, 11),
-              ("UnableToDischarge",       0b0000010000000000, 10),
-              ("UnableToStopDischarging", 0b0000001000000000, 9),
-              ("OutputVoltageAbnormal",   0b0000000100000000, 8),
-              ("InputOverpressure",       0b0000000010000000, 7),
-              ("HighVoltageSideShort",    0b0000000001000000, 6),
-              ("BoostOverpressure",       0b0000000000100000, 5),
-              ("OutputOverpressure",      0b0000000000010000, 4),
-              ("Fault",                   0b0000000000000010, 1),
-              ("Running",                 0b0000000000000001, 0)]
+    tuples = [("Short Circuit", 0b0000100000000000, 11),
+              ("Unable To Discharge", 0b0000010000000000, 10),
+              ("Unable To Stop Discharging", 0b0000001000000000, 9),
+              ("OutputVoltageAbnormal", 0b0000000100000000, 8),
+              ("Input Overpressure", 0b0000000010000000, 7),
+              ("High Voltage Side Short", 0b0000000001000000, 6),
+              ("Boost Overpressure", 0b0000000000100000, 5),
+              ("Output Overpressure", 0b0000000000010000, 4),
+              ("Fault", 0b0000000000000010, 1),
+              ("Running", 0b0000000000000001, 0)]
 
     # Iterate through the above tuples and generate output for each bitmasked
     # and shifted value
@@ -268,17 +351,18 @@ def CHARGINGEQUIPMENTSTATUS(value, times):
         name = tup[0]
         mask = tup[1]
         shift = tup[2]
-        stat.append(", %s:" % name)
         temp = (value & mask) >> shift
+        res = None
         if temp == 0x1:
-            stat.append("True")
+            res = "True"
         else:
-            stat.append("False")
+            res = "False"
+        results.append(Result(address, name, res))
 
-    return "".join(stat)
+    return results
 
 
-def DISCHARGINGEQUIPMENTSTATUS(value, times):
+def DISCHARGINGEQUIPMENTSTATUS(address, value, times):
     """
     D15-D14: Input volt status.
         00 normal
@@ -301,42 +385,46 @@ def DISCHARGINGEQUIPMENTSTATUS(value, times):
     D1: 0 Normal, 1 Fault.
     D0: 1 Running, 0 Standby.
     """
+    results = []
+    res = None
     stat = ["InputVoltStatus", ]
     temp = (value & 0b1100000000000000) >> 14
     if temp == 0x0:
-        stat.append("normal")
+        res = "normal"
     elif temp == 0x01:
-        stat.append("no power connected")
+        res = "no power connected"
     elif temp == 0x02:
-        stat.append("higher volt input")
+        res = "higher volt input"
     elif temp == 0x03:
-        stat.append("input voltage error")
+        res = "input voltage error"
     else:
         raise RuntimeError("No such input volt status: %s" % value)
+    results.append(Result(address, "Input Volt Status", res))
 
-    stat.append(", ChargingStatus:")
+    res = None
     temp = (value & 0b0000000000001100) >> 2
     if temp == 0x0:
-        stat.append("no charging")
+        res = "no charging"
     elif temp == 0x01:
-        stat.append("float")
+        res = "float"
     elif temp == 0x02:
-        stat.append("boost")
+        res = "boost"
     elif temp == 0x03:
-        stat.append("equalization")
+        res = "equalization"
     else:
         raise RuntimeError("No such charging status: %s" % value)
+    results.append(Result(address, "Charging Status", res))
 
-    tuples = [("ChargingMosfetShort",              0b0010000000000000, 13),
-              ("Charging/Anti-ReverseMosfetShort", 0b0001000000000000, 12),
-              ("Anti-reverseMosfetShort",          0b0000100000000000, 11),
-              ("InputOvercurrent",                 0b0000010000000000, 10),
-              ("LoadOvercurrent",                  0b0000001000000000, 9),
-              ("LoadShort",                        0b0000000100000000, 8),
-              ("LoadMosfetShort",                  0b0000000010000000, 7),
-              ("PVShort",                          0b0000000001000000, 4),
-              ("Status",                           0b0000000000000010, 1),
-              ("Running",                          0b0000000000000001, 0)]
+    tuples = [("Charging MOSFET Short", 0b0010000000000000, 13),
+              ("Charging/Anti-Reverse MOSFET Short", 0b0001000000000000, 12),
+              ("Anti-reverse MOSFET Short", 0b0000100000000000, 11),
+              ("Input Overcurrent", 0b0000010000000000, 10),
+              ("Load Overcurrent", 0b0000001000000000, 9),
+              ("Load Short", 0b0000000100000000, 8),
+              ("Load MOSFET Short", 0b0000000010000000, 7),
+              ("PV Short", 0b0000000001000000, 4),
+              ("Status", 0b0000000000000010, 1),
+              ("Running", 0b0000000000000001, 0)]
 
     # Iterate through the above tuples and generate output for each bitmasked
     # and shifted value
@@ -344,49 +432,14 @@ def DISCHARGINGEQUIPMENTSTATUS(value, times):
         name = tup[0]
         mask = tup[1]
         shift = tup[2]
-        stat.append(", %s:" % name)
+        res = None
         temp = (value & mask) >> shift
         if temp == 0x1:
-            stat.append("True")
+            res = "True"
         else:
-            stat.append("False")
-    return "".join(stat)
+            res = "False"
+        results.append(Result(address, name, res))
 
-
-def __getLowAndHighBytes(value):
-    high = (value & 0b1111111100000000) >> 8
-    low = value & 0b0000000011111111
-    return (high, low)
-
-def HOURMIN(value, times):
-    return "hour:minute %s:%s" % __getLowAndHighBytes(value)
-
-
-def RTCSECMIN(value, times):
-    return "%s:%s" % __getLowAndHighBytes(value)
-
-
-def RTCHOURDAY(value, times):
-    return "%s:%s" % __getLowAndHighBytes(value)
-
-
-def RTCYEARMONTH(value, times):
-    return "%s:%s" % __getLowAndHighBytes(value)
-
-
-def OVERTEMP(value, times):
-    return "Yes" if value == 1 else "No"
-
-
-def DAYNIGHT(value, times):
-    return "Night" if value == 1 else "Day"
-
-
-def OFFON(value, times):
-    return "On" if value == 1 else "Off"
-
-
-def MANAGEMENTMODES(value, times):
-    return "SOC" if value == 1 else "Voltage Compensation"
+    return results
 
 
