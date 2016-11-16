@@ -168,7 +168,9 @@ def communicate(ser, deviceId, address, register, debug=False):
     # Strip off the header and CRC then convert it using the unit function 
     # pointer
     data = rec[3:-2] 
-    return combineBytes(data)
+
+    # Convert to communication Results
+    return reg.unit(addr, combineBytes(data), reg.times)
 
 
 if __name__ == "__main__":
@@ -182,14 +184,10 @@ if __name__ == "__main__":
         deviceId = 0x01
 
         # Query the device 10 times and exit
-        for _ in xrange(10):
+        for _ in xrange(1):
             for addr, reg in sorted(mappings.REGISTERS.iteritems()):
-                value = communicate(ser, deviceId, addr, reg, debug=False)
-
-                # Convert to readable text
-                readable = reg.unit(addr, value, reg.times)
-
-                print "%s \"%s\": %s" % (hex(addr), reg.name, readable)
+                result = communicate(ser, deviceId, addr, reg, debug=False)
+                print "%s \"%s\": %s" % (hex(addr), reg.name, result)
             time.sleep(1)
     except:
         raise
