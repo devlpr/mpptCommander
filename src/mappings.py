@@ -35,7 +35,6 @@ class Register(namedtuple("Register", ["name",
     __slots__ = ()
 
 
-
 # For clarity I am letting these lines be long. I am less concerned with brevity
 # here.  Right or wrong, that's the choice I made.
 REGISTERS = {
