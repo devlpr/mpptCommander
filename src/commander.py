@@ -19,7 +19,6 @@
 import crc
 import os
 import platform
-import rrdtool
 import serial
 import serial.rs485
 import sys
