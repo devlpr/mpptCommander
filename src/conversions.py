@@ -14,6 +14,10 @@ class Result(namedtuple("Result", ["register", "unit", "value"])):
     @param value: The result in the units mentioned above
     """
     __slots__ = ()
+    def __str__(self):
+        return "Result(register: %s, unit: %s, value: %s)" % (self.register,
+                                                              self.unit,
+                                                              self.value)
 
 def __getLowAndHighBytes(value):
     high = (value & 0b1111111100000000) >> 8
