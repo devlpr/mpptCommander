@@ -43,7 +43,7 @@ REGISTERS = {
     5: Register("Enable load test mode", "1 Enable, 0 Disable(normal)", ENABLETEST, 1, 1),
     6: Register("Force the load on/off", "1 Turn on, 0 Turn off (used for temporary test of the load)", OFFON, 1, 1),
     0x2000: Register("Over temperature inside the device", "Over temperature inside device", OVERTEMP, 1, 1),
-    0x200C: Register("Day/Night", "1-Night, 0-Day", DAYNIGHT, 1, 1),
+    0x200C: Register("Night", "1-Night, 0-Day", DAYNIGHT, 1, 1),
     # Input registers
     0x3000: Register("Charging equipment rated input voltage", "PV array rated voltage", V, 100, 1),
     0x3001: Register("Charging equipment rated input current", "PV array rated current", A, 100, 1),
