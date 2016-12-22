@@ -169,7 +169,7 @@ def communicate(ser, deviceId, address, register, debug=False):
     data = rec[3:-2] 
 
     # Convert to communication Results
-    return reg.unit(addr, combineBytes(data), reg.times)
+    return register.unit(address, combineBytes(data), register.times)
 
 
 if __name__ == "__main__":
